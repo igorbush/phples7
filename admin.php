@@ -39,16 +39,25 @@
 				    echo "<p class='sub_text'>Ошибка: файл НЕ загружен! Файл должен быть типа .json</p>";
 				    exit;
 			    }
-				if($_FILES['uploaded_file']['error'] === UPLOAD_ERR_OK && move_uploaded_file($_FILES['uploaded_file']['tmp_name'], $target_file))
+			    $test_json = $_FILES['uploaded_file']['name'];
+				$test = file_get_contents($test_json);
+				$test = json_decode($test, true);
+				foreach($test as $qnumber => $qobj)
 				{
-					echo "<p class=\'sub_text\'>Файл загружен</p>"; 
-					header('Location: ' . 'list.php');
-				}
-				else
-				{
-					echo "<p class=\'sub_text\'>Файл НЕ загружен</p>";
-				}
+				    if (isset($qnumber) && isset($qobj['answers']) && isset($qobj['question'])) 
+				    {   	
+						if($_FILES['uploaded_file']['error'] === UPLOAD_ERR_OK && move_uploaded_file($_FILES['uploaded_file']['tmp_name'], $target_file))
+						{
+							echo "<p class='sub_text'>Файл загружен</p>"; 
+							header('Location: ' . 'list.php');
+						}
+					}
+					else
+					{
+						echo "<p class='sub_text'>Файл НЕ загружен, т.к. не удовлетворяет требованиям по содержанию</p>"; break;
+					}
 				
+				}
 			}
 		?>
 		<p class="before_button">*ВНИМАНИЕ! После нажатия на кнопку "ЗУГРУЗИТЬ", Вы будете перенаправленны на страницу со списком загруженных тестов</p>
